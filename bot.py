@@ -6,7 +6,7 @@ from playwright.async_api import async_playwright
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TELEGRAM_BOT_TOKEN = "8705942752:AAE2kk91ODRJbqKNqvJUg6PipiLsiGWkPvI"
+TELEGRAM_BOT_TOKEN = "8875104046:AAH-BdfUQw1AuLpqbcJiTga_kUa9DVHZfrA"
 MOBILE_NUMBER = "9381827477" 
 USER_NAME = "imran"
 SELFIE_PATH = "image1783085563d387c7da850b3fee.jpg"

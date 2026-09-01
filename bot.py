@@ -36,7 +36,7 @@ async def play_game_automation():
         page = await context.new_page()
 
         try:
-            await page.add_init_script(f\"\"\"
+            await page.add_init_script(f"""
                 window._forceShot = 0.12;
                 Math.random = () => window._forceShot !== undefined ? window._forceShot : Math.random();
 
@@ -60,7 +60,7 @@ async def play_game_automation():
                 const origSetInterval = window.setInterval;
                 window.setTimeout = (fn, delay = 0, ...args) => origSetTimeout(fn, delay / speedFactor, ...args);
                 window.setInterval = (fn, delay = 0, ...args) => origSetInterval(fn, delay / speedFactor, ...args);
-            \"\"\")
+            """)
 
             await page.goto("https://bounce.makear.org/")
             await page.wait_for_load_state("domcontentloaded")
@@ -78,11 +78,11 @@ async def play_game_automation():
                 except:
                     pass
 
-            await page.evaluate(f\"\"\"
+            await page.evaluate(f"""
                 () => new Promise(resolve => {{
                     const id = setInterval(() => {{
                         const el = document.querySelector('#score') || document.querySelector('.score') || document.getElementById('currentScore') || document.getElementById('scoreNumber');
-                        const score = el ? parseInt(el.innerText.replace(/\\\\D/g,'')) || 0 : 0;
+                        const score = el ? parseInt(el.innerText.replace(/\\D/g,'')) || 0 : 0;
                         if (score >= {TARGET_SCORE}) {{
                             clearInterval(id);
                             window._forceShot = 0.9;
@@ -90,7 +90,7 @@ async def play_game_automation():
                         }}
                     }}, 40);
                 }})
-            \"\"\")
+            """)
 
             await page.wait_for_selector("#formScreen", state="visible", timeout=30000)
             await asyncio.sleep(1)
@@ -106,7 +106,7 @@ async def play_game_automation():
             await page.set_input_files("#galleryInput", SELFIE_PATH)
             await asyncio.sleep(1)
 
-            await page.evaluate(\"\"\"() => {
+            await page.evaluate("""() => {
                 const input = document.getElementById('galleryInput');
                 if (!input || !input.files || input.files.length === 0) return false;
                 const file = input.files[0];
@@ -114,7 +114,7 @@ async def play_game_automation():
                 input.dispatchEvent(event);
                 if (typeof handleFileSelect === 'function') handleFileSelect(file);
                 if (window.userData) window.userData.photo = file;
-            }\"\"\")
+            }""")
             
             await asyncio.sleep(1.2)
             await page.locator('button[type="submit"]').first.click()
@@ -145,7 +145,8 @@ async def run_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Automation failed.")
 
 def main():
-    app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN)
+    app = ApplicationBuilder().token(token).build()
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("run", run_command))
     app.run_polling()

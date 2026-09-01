@@ -7,7 +7,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 TELEGRAM_BOT_TOKEN = "8705942752:AAE2kk91ODRJbqKNqvJUg6PipiLsiGWkPvI"
 MOBILE_NUMBER = "9381827477" 
 USER_NAME = "imran"
-SELFIE_PATH = "image1783085563d387c7da850b3fee.jpg"" 
+SELFIE_PATH = "image1783085563d387c7da850b3fee.jpg"
 TARGET_SCORE = 4300
 SPEED_FACTOR = 2.0  
 

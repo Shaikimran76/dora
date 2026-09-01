@@ -1,5 +1,7 @@
 import os
 import asyncio
+import http.server
+import threading
 from playwright.async_api import async_playwright
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -10,6 +12,21 @@ USER_NAME = "imran"
 SELFIE_PATH = "image1783085563d387c7da850b3fee.jpg"
 TARGET_SCORE = 4300
 SPEED_FACTOR = 2.0  
+
+# --- DUMMY HTTP SERVER FOR RENDER WEB SERVICE ---
+class HealthCheckHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+    def log_message(self, format, *args):
+        pass # Suppress logs to keep output clean
+
+def start_dummy_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = http.server.HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
+# -----------------------------------------------
 
 async def play_game_automation():
     if not os.path.exists(SELFIE_PATH):
@@ -145,10 +162,15 @@ async def run_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Automation failed.")
 
 def main():
+    # Start the dummy web server in a separate background thread so Render detects an open port
+    threading.Thread(target=start_dummy_server, daemon=True).start()
+
     token = os.environ.get("TELEGRAM_BOT_TOKEN", TELEGRAM_BOT_TOKEN)
     app = ApplicationBuilder().token(token).build()
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("run", run_command))
+    
+    print("🤖 Telegram Bot is running with port listener...")
     app.run_polling()
 
 if __name__ == "__main__":
